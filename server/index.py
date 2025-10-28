@@ -1,15 +1,16 @@
-from flask import Flask , request , abort ,jsonify
+from flask import Flask , request , abort ,jsonify ,session
 from flask_bcrypt import Bcrypt
 from config.appconfig import ApplicationConfig
 from database.model import Users , db
 from redis import Redis
+from flask_session import Session
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
 db.init_app(app)
 bcrypt = Bcrypt(app)
-redis = Redis(host='redis', port =6789)
-
+redis = Redis(host='redis', port =6379)
+server_session = Session(app)
 
 @app.get('/')
 def hello():
@@ -47,7 +48,22 @@ def login_user():
         return jsonify({"error":"Unauthorised"}),401
     
     if not bcrypt.check_password_hash(user_exist.password_hash,password):
-        return jsonify({"error":"Unauthorised"}),401    
+        return jsonify({"error":"Unauthorised"}),401   
+    
+    print(
+        "--------------------------------"
+        "--------------------------------"
+        "--------------------------------"
+        "--------------------------------"
+        "--------------------------------"
+        "--------------------------------"
+        "--------------------------------"
+        "--------------------------------"
+        "--------------------------------"
+        "--------------------------------"
+    )
+
+    session['user_id']=user_exist.id 
 
     return jsonify({
         "id": user_exist.id,
@@ -57,4 +73,4 @@ def login_user():
 if __name__=="__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True,port=5000)
