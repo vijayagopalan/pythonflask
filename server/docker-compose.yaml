@@ -3,7 +3,7 @@ services:
     image: redislabs/redismod
     container_name: redis
     ports:
-      - '6789:6379'
+      - '6379:6379'
   
   web:
     build: .
